@@ -87,7 +87,7 @@ class StaggeredLogger:
         self.index = 0
         self.file_path = output_folder + file_name
         if not os.path.exists(output_folder):
-            os.mkdir(output_folder)
+            os.makedirs(output_folder)
         if not os.path.exists(self.file_path):
             log_file = open(output_folder + file_name, "x")
             log_file.close()
