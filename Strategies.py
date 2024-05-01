@@ -37,9 +37,9 @@ class KeepNAndAbove(Strategy):
     def action(self, my_cards, revealed_player_cards, revealed_dealer_cards, player_trade_history,
                dealer_redraw_history, current_turn: int):
         """
-        Returns True if the value of the current card is at least the threshold n,
+        Returns False if the value of the current card is at least the threshold n,
         which was set during instance creation.
-        Returns False otherwise.
+        Returns True otherwise.
 
 
         :param my_cards: the list of cards
@@ -49,4 +49,4 @@ class KeepNAndAbove(Strategy):
         :param player_trade_history: not used.
         :param dealer_redraw_history: not used.
         """
-        return self.scorer(my_cards[current_turn]) <= self.threshold
+        return self.scorer(my_cards[current_turn]) < self.threshold

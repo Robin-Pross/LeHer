@@ -2,33 +2,68 @@ import os
 import json
 
 
-def get_results(output_folder, file_name, include_scores=True):
+def get_results(output_folder, file_name, include_scores=True, include_cards=False, include_deck=False,
+                include_history=False):
     """
     Returns a dictionary with the data from the specified file.
     Only data specified in the parameters in included in the dictionary.
     If data is not included in the dictionary the value for the key is None.
     The keys are (without '):
-    'player_scores' and 'dealer_scores'
+    'decks','player_cards', 'dealer_cards', 'player_histories', 'dealer_histories', 'player_scores' and 'dealer_scores'
 
     :param output_folder: path (as string) to output folder, can be relative or absolute
     :param file_name: name of the log file (with extension)
     :param include_scores: whether scores are part of the return dictionary
+    :param include_cards: whether cards in hand at the end of the game are part of the return dictionary
+    :param include_deck: whether the decks at the start of the game are part of the return dictionary
+    :param include_history: whether the attempted actions are part of the return dictionary
     :return: returns a dictionary with the results
     """
     results = {
         "player_scores": None,
-        "dealer_scores": None
+        "dealer_scores": None,
+        "player_cards": None,
+        "dealer_cards": None,
+        "player_histories": None,
+        "dealer_histories": None,
+        "decks": None
     }
     with open(output_folder + file_name) as data_file:
         data = json.load(data_file)
-    if include_scores:
-        player_scores = []
-        dealer_scores = []
-        for game in data['games']:
+
+    player_scores = []
+    dealer_scores = []
+    player_cards = []
+    dealer_cards = []
+    player_histories = []
+    dealer_histories = []
+    decks = []
+
+    for game in data['games']:
+        if include_cards:
+            player_cards.append(game['player_cards'])
+            dealer_cards.append(game['dealer_cards'])
+        if include_scores:
             player_scores.append(game['player_score'])
             dealer_scores.append(game['dealer_score'])
+        if include_history:
+            player_histories.append(game['player_history'])
+            dealer_histories.append(game['dealer_history'])
+        if include_deck:
+            decks.append(game['deck_to_start_of_game'])
+
+    if include_cards:
+        results["player_cards"] = player_cards
+        results["dealer_cards"] = dealer_cards
+    if include_scores:
         results["player_scores"] = player_scores
         results["dealer_scores"] = dealer_scores
+    if include_history:
+        results["player_histories"] = player_histories
+        results["dealer_histories"] = dealer_histories
+    if include_deck:
+        results["decks"] = decks
+
     return results
 
 

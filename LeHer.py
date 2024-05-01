@@ -65,7 +65,7 @@ class LeHer:
         self.next_player_card = None
 
     def auto_play(self, GAMES_TO_AUTOPLAY, AUTO_PLAY_LOG_DIR, AUTO_PLAY_LOG_FILENAME, REMOVE_DRAWN_CARDS_FROM_DECK,
-                  SILENT_MODE=False):
+                  SILENT_MODE=False, LOG_ALL=False):
         """
         Plays a specified amount of games with the player AI against the dealer AI with no user input.
         Gives a progress update every percent of games played which includes current percent done, time since start and
@@ -76,9 +76,13 @@ class LeHer:
         :param AUTO_PLAY_LOG_FILENAME: the name of the log file (with .json extension)
         :param REMOVE_DRAWN_CARDS_FROM_DECK: whether cards drawn should be removed from the deck
         :param SILENT_MODE: turns off progress updates in console
+        :param LOG_ALL: whether everything should be logged or only the scores
         :return: returns a dictionary with the results of the games (as well as any previous games from the same file)
                  see get_results in DataProcessing for more info
         """
+        # add .json at the end if not already present
+        if AUTO_PLAY_LOG_FILENAME[:-5] != ".json":
+            AUTO_PLAY_LOG_FILENAME = AUTO_PLAY_LOG_FILENAME + ".json"
         current_game = 0
         logger = DataProcessing.StaggeredLogger(AUTO_PLAY_LOG_DIR, AUTO_PLAY_LOG_FILENAME)
         start_time = time.time()
@@ -102,7 +106,13 @@ class LeHer:
                     self.dealer_history.append("NOT_ATTEMPTED")
                 current_turn += 1
             self.score()
-            logger.add_game(player_score=self.player_score, dealer_score=self.dealer_score)
+            if LOG_ALL:
+                logger.add_game(player_score=self.player_score, dealer_score=self.dealer_score,
+                                player_cards=self.player_cards, dealer_cards=self.dealer_cards,
+                                player_history=self.player_history, dealer_history=self.dealer_history,
+                                deck_to_start_of_game=self.shuffled_deck)
+            else:
+                logger.add_game(player_score=self.player_score, dealer_score=self.dealer_score)
             current_game += 1
             if not SILENT_MODE:
                 for i in range(0, 100):
@@ -112,8 +122,13 @@ class LeHer:
                             end_time - time_since_last_interval_completion) + ")")
                         time_since_last_interval_completion = time.time()
         logger.log_staggered_games()
-        return DataProcessing.get_results(output_folder=AUTO_PLAY_LOG_DIR, file_name=AUTO_PLAY_LOG_FILENAME,
-                                          include_scores=True)
+        if LOG_ALL:
+            return DataProcessing.get_results(output_folder=AUTO_PLAY_LOG_DIR, file_name=AUTO_PLAY_LOG_FILENAME,
+                                              include_scores=True, include_deck=True, include_cards=True,
+                                              include_history=True)
+        else:
+            return DataProcessing.get_results(output_folder=AUTO_PLAY_LOG_DIR, file_name=AUTO_PLAY_LOG_FILENAME,
+                                              include_scores=True)
 
     def reset_state(self, is_player, remove_drawn_cards_from_deck):
         """
@@ -161,10 +176,10 @@ class LeHer:
         if not self.remove_drawn_cards_from_deck and self.PRE_SHUFFLED_DECK is None:
             if self.next_player_card is None:
                 self.player_cards.append(random.choice(self.current_deck))
+                self.shuffled_deck.append(self.player_cards[-1])
             else:
                 self.player_cards.append(self.next_player_card)
                 self.next_player_card = None
-            self.shuffled_deck.append(self.player_cards[-1])
             self.dealer_cards.append(random.choice(self.current_deck))
             self.shuffled_deck.append(self.dealer_cards[-1])
         else:
