@@ -3,56 +3,43 @@ import time
 import math
 
 from Decks import STANDARD_DECK
-from Scorer import STANDARD_SCORER
+from Scorer import standard_scorer
 from Strategies import KeepNAndAbove
 import DataProcessing
 
 
 class LeHer:
     def __init__(self, *,
-                 UNSHUFFLED_DECK=None, TURNS_PER_GAME=13,
-                 SCORER=STANDARD_SCORER, PLAYER_AI=KeepNAndAbove(n=8, is_player=True),
+                 UNSHUFFLED_DECK=STANDARD_DECK, SCORER=standard_scorer, PLAYER_AI=KeepNAndAbove(n=8, is_player=True),
                  DEALER_AI=KeepNAndAbove(n=8, is_player=False),
-                 gui_language="EN",
-                 RNG_SEED=None, PRE_SHUFFLED_DECK=None,
-                 HIDE_UNKNOWN_CARDS=True):
+                 RNG_SEED=None, PRE_SHUFFLED_DECK=None, TURNS_PER_GAME=13):
         """
         Sets parameters that stay the same for every game played.
         Does not launch the gui or play with AI against AI.
         Does not prepare the game in any way (shuffle deck, etc.)
         Call function auto_play or launch_gui on instance of the game to start.
 
-        :param UNSHUFFLED_DECK: the deck to be used, is STANDARD_DECK by default
-        :param TURNS_PER_GAME: the amount of turns per game
+        :param UNSHUFFLED_DECK: the deck to be used, standard deck of 52 by default
         :param SCORER: the scorer
         :param PLAYER_AI: the player AI
         :param DEALER_AI: the dealer AI
-        :param gui_language: the language of the text in the gui
         :param RNG_SEED: the rng seed
         :param PRE_SHUFFLED_DECK: the deck to be used instead of using a shuffled version of the unshuffled deck
-        :param HIDE_UNKNOWN_CARDS: whether cards that the user does not know are hidden or revealed
+        :param TURNS_PER_GAME: the amount of turns per game, 13 by default
         """
         if RNG_SEED is not None:
             random.seed(RNG_SEED)
-        if UNSHUFFLED_DECK is None:
-            self.UNSHUFFLED_DECK = STANDARD_DECK
-        else:
-            self.UNSHUFFLED_DECK = UNSHUFFLED_DECK
-        self.TURNS_PER_GAME = TURNS_PER_GAME
+        self.UNSHUFFLED_DECK = UNSHUFFLED_DECK
         self.SCORER = SCORER
         self.PLAYER_AI = PLAYER_AI
         self.DEALER_AI = DEALER_AI
         self.PRE_SHUFFLED_DECK = PRE_SHUFFLED_DECK
-        self.HIDE_UNKNOWN_CARDS = HIDE_UNKNOWN_CARDS
+        self.TURNS_PER_GAME = TURNS_PER_GAME
 
         self.is_player = None
         self.remove_drawn_cards_from_deck = None
         self.turn_count = None
         self.player_cards = None
-        self.player_shown_cards = None
-        self.dealer_shown_cards = None
-        self.player_card_labels = None
-        self.dealer_card_labels = None
         self.player_score = None
         self.player_history = None
         self.dealer_cards = None
@@ -64,7 +51,7 @@ class LeHer:
         self.current_deck = None
         self.next_player_card = None
 
-    def auto_play(self, GAMES_TO_AUTOPLAY, AUTO_PLAY_LOG_DIR, AUTO_PLAY_LOG_FILENAME, REMOVE_DRAWN_CARDS_FROM_DECK,
+    def auto_play(self, GAMES_TO_AUTOPLAY, AUTO_PLAY_LOG_DIR, auto_play_log_filename, REMOVE_DRAWN_CARDS_FROM_DECK,
                   SILENT_MODE=False, LOG_ALL=False):
         """
         Plays a specified amount of games with the player AI against the dealer AI with no user input.
@@ -73,7 +60,7 @@ class LeHer:
 
         :param GAMES_TO_AUTOPLAY: the amount of games to play
         :param AUTO_PLAY_LOG_DIR: the directory of the log file (relative or absolute)
-        :param AUTO_PLAY_LOG_FILENAME: the name of the log file (with .json extension)
+        :param auto_play_log_filename: the name of the log file (with .json extension)
         :param REMOVE_DRAWN_CARDS_FROM_DECK: whether cards drawn should be removed from the deck
         :param SILENT_MODE: turns off progress updates in console
         :param LOG_ALL: whether everything should be logged or only the scores
@@ -81,30 +68,31 @@ class LeHer:
                  see get_results in DataProcessing for more info
         """
         # add .json at the end if not already present
-        if AUTO_PLAY_LOG_FILENAME[:-5] != ".json":
-            AUTO_PLAY_LOG_FILENAME = AUTO_PLAY_LOG_FILENAME + ".json"
+        if auto_play_log_filename[:-5] != ".json":
+            auto_play_log_filename = auto_play_log_filename + ".json"
         current_game = 0
-        logger = DataProcessing.StaggeredLogger(AUTO_PLAY_LOG_DIR, AUTO_PLAY_LOG_FILENAME)
+        logger = DataProcessing.StaggeredLogger(AUTO_PLAY_LOG_DIR, auto_play_log_filename)
         start_time = time.time()
         time_since_last_interval_completion = time.time()
         while GAMES_TO_AUTOPLAY > current_game:
             self.reset_state(None, REMOVE_DRAWN_CARDS_FROM_DECK)
-            current_turn = 0
-            while self.TURNS_PER_GAME > current_turn:
+            # turn_count starts at -1 and increases in draw_cards
+            # turn_count during condition check is one less than during the loop
+            # condition is offset by 1 to accommodate for that
+            while self.TURNS_PER_GAME > self.turn_count + 1:
                 self.draw_cards()
                 if self.PLAYER_AI.action(self.player_cards, self.revealed_player_cards_to_dealer,
                                          self.revealed_dealer_cards_to_player, self.player_history,
-                                         self.dealer_history, current_turn):
+                                         self.dealer_history, self.turn_count):
                     self.player_action()
                 else:
                     self.player_history.append("NOT_ATTEMPTED")
                 if self.DEALER_AI.action(self.dealer_cards, self.revealed_player_cards_to_dealer,
                                          self.revealed_dealer_cards_to_player, self.player_history,
-                                         self.dealer_history, current_turn):
+                                         self.dealer_history, self.turn_count):
                     self.dealer_action()
                 else:
                     self.dealer_history.append("NOT_ATTEMPTED")
-                current_turn += 1
             self.score()
             if LOG_ALL:
                 logger.add_game(player_score=self.player_score, dealer_score=self.dealer_score,
@@ -123,11 +111,11 @@ class LeHer:
                         time_since_last_interval_completion = time.time()
         logger.log_staggered_games()
         if LOG_ALL:
-            return DataProcessing.get_results(output_folder=AUTO_PLAY_LOG_DIR, file_name=AUTO_PLAY_LOG_FILENAME,
+            return DataProcessing.get_results(output_folder=AUTO_PLAY_LOG_DIR, file_name=auto_play_log_filename,
                                               include_scores=True, include_deck=True, include_cards=True,
                                               include_history=True)
         else:
-            return DataProcessing.get_results(output_folder=AUTO_PLAY_LOG_DIR, file_name=AUTO_PLAY_LOG_FILENAME,
+            return DataProcessing.get_results(output_folder=AUTO_PLAY_LOG_DIR, file_name=auto_play_log_filename,
                                               include_scores=True)
 
     def reset_state(self, is_player, remove_drawn_cards_from_deck):
@@ -141,12 +129,8 @@ class LeHer:
         self.next_player_card = None
         self.is_player = is_player
         self.remove_drawn_cards_from_deck = remove_drawn_cards_from_deck
-        self.turn_count = 0
+        self.turn_count = -1
         self.player_cards = []
-        self.player_shown_cards = []
-        self.dealer_shown_cards = []
-        self.player_card_labels = []
-        self.dealer_card_labels = []
         self.player_score = 0
         self.player_history = []
         self.dealer_cards = []
@@ -173,6 +157,7 @@ class LeHer:
         """
         Add a card to both the player and dealer
         """
+        self.turn_count += 1
         if not self.remove_drawn_cards_from_deck and self.PRE_SHUFFLED_DECK is None:
             if self.next_player_card is None:
                 self.player_cards.append(random.choice(self.current_deck))
@@ -194,13 +179,14 @@ class LeHer:
         """
         if self.dealer_cards[-1][0] == "K":
             self.player_history.append("ATTEMPTED_BUT_FAILED")
-            return
+            return False
         self.player_history.append("SUCCEEDED")
         self.revealed_dealer_cards_to_player[self.turn_count] = True
         self.revealed_player_cards_to_dealer[self.turn_count] = True
         temp = self.player_cards[-1]
         self.player_cards[-1] = self.dealer_cards[-1]
         self.dealer_cards[-1] = temp
+        return True
 
     def dealer_action(self):
         """
@@ -214,17 +200,17 @@ class LeHer:
             if new_card[0] == "K":
                 self.dealer_history.append("ATTEMPTED_BUT_FAILED")
                 self.next_player_card = new_card
-                return
+                return False
             self.next_player_card = self.dealer_cards[-1]
             self.dealer_cards[-1] = new_card
             self.revealed_dealer_cards_to_player[self.turn_count] = False
             if self.turn_count + 1 < self.TURNS_PER_GAME:
                 self.revealed_player_cards_to_dealer[self.turn_count + 1] = True
             self.dealer_history.append("SUCCEEDED")
-            return
+            return True
         if self.current_deck[-1][0] == "K":
             self.dealer_history.append("ATTEMPTED_BUT_FAILED")
-            return
+            return False
         self.dealer_history.append("SUCCEEDED")
         temp = self.current_deck.pop()
         self.current_deck.append(self.dealer_cards[-1])
@@ -232,6 +218,7 @@ class LeHer:
         self.revealed_dealer_cards_to_player[self.turn_count] = False
         if self.turn_count + 1 < self.TURNS_PER_GAME:
             self.revealed_player_cards_to_dealer[self.turn_count + 1] = True
+        return True
 
     def score(self):
         """
@@ -242,3 +229,50 @@ class LeHer:
             self.player_score += self.SCORER(card)
         for card in self.dealer_cards:
             self.dealer_score += self.SCORER(card)
+
+    def get_card(self, from_player, index):
+        """
+
+        :param from_player: whether the card is from the player hand
+        :param index: the index of the card
+        :return: returns the card with specified index from the hand of the specified participant
+        """
+        if from_player:
+            return self.player_cards[index]
+        else:
+            return self.dealer_cards[index]
+
+    def is_revealed(self, from_player, index):
+        """
+
+        :param from_player: whether the card is from the player hand
+        :param index: the index of the card
+        :return: returns whether the card with specified index from the hand of the
+                 specified participant has been revealed to the opponent
+        """
+        if from_player:
+            return self.revealed_player_cards_to_dealer[index]
+        else:
+            return self.revealed_dealer_cards_to_player[index]
+
+    def get_scores(self):
+        """
+
+        :return: returns the scores of the player and dealer as a tuple (player_score, dealer_score)
+        """
+        return self.player_score, self.dealer_score
+
+    def ask_ai(self, asks_player_ai, current_turn):
+        """
+        :param asks_player_ai: whether the player AI is the one being asked
+        :param current_turn: the current turn
+        :return: returns True if the specified AI would take their action this turn
+        """
+        if asks_player_ai:
+            return self.PLAYER_AI.action(self.player_cards, self.revealed_player_cards_to_dealer,
+                                         self.revealed_dealer_cards_to_player, self.player_history,
+                                         self.dealer_history, current_turn)
+        else:
+            return self.DEALER_AI.action(self.dealer_cards, self.revealed_player_cards_to_dealer,
+                                         self.revealed_dealer_cards_to_player, self.player_history,
+                                         self.dealer_history, current_turn)

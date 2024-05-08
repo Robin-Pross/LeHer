@@ -18,7 +18,7 @@ class TestAutoPlay(unittest.TestCase):
         file_name = "only Kings redraw"
         self.delete_old_test_file(file_name)
         game = LeHer(UNSHUFFLED_DECK=["7S"])
-        results = game.auto_play(AUTO_PLAY_LOG_DIR=self.TEST_OUTPUT_DIRECTORY, AUTO_PLAY_LOG_FILENAME=file_name,
+        results = game.auto_play(AUTO_PLAY_LOG_DIR=self.TEST_OUTPUT_DIRECTORY, auto_play_log_filename=file_name,
                                  GAMES_TO_AUTOPLAY=1, REMOVE_DRAWN_CARDS_FROM_DECK=False, SILENT_MODE=True,
                                  LOG_ALL=True)
         self.assertEqual(results["player_scores"], [91])
@@ -33,7 +33,7 @@ class TestAutoPlay(unittest.TestCase):
         file_name = "only Kings no redraw"
         self.delete_old_test_file(file_name)
         game = LeHer(UNSHUFFLED_DECK=["7S"] * 27)
-        results = game.auto_play(AUTO_PLAY_LOG_DIR=self.TEST_OUTPUT_DIRECTORY, AUTO_PLAY_LOG_FILENAME=file_name,
+        results = game.auto_play(AUTO_PLAY_LOG_DIR=self.TEST_OUTPUT_DIRECTORY, auto_play_log_filename=file_name,
                                  GAMES_TO_AUTOPLAY=1, REMOVE_DRAWN_CARDS_FROM_DECK=True, SILENT_MODE=True,
                                  LOG_ALL=True)
         self.assertEqual(results["player_scores"], [91])
@@ -48,7 +48,7 @@ class TestAutoPlay(unittest.TestCase):
         file_name = "deck in order no redraw"
         self.delete_old_test_file(file_name)
         game = LeHer(PRE_SHUFFLED_DECK=STANDARD_DECK)
-        results = game.auto_play(AUTO_PLAY_LOG_DIR=self.TEST_OUTPUT_DIRECTORY, AUTO_PLAY_LOG_FILENAME=file_name,
+        results = game.auto_play(AUTO_PLAY_LOG_DIR=self.TEST_OUTPUT_DIRECTORY, auto_play_log_filename=file_name,
                                  GAMES_TO_AUTOPLAY=1, REMOVE_DRAWN_CARDS_FROM_DECK=True, SILENT_MODE=True,
                                  LOG_ALL=True)
         self.assertEqual(results["player_scores"], [85])
@@ -74,7 +74,7 @@ class TestAutoPlay(unittest.TestCase):
         game = LeHer(PRE_SHUFFLED_DECK=STANDARD_DECK)
         # setting rng is not necessary as it is only used when generating new cards from the deck
         # when using a pre_shuffled_deck no new cards are generated
-        results = game.auto_play(AUTO_PLAY_LOG_DIR=self.TEST_OUTPUT_DIRECTORY, AUTO_PLAY_LOG_FILENAME=file_name,
+        results = game.auto_play(AUTO_PLAY_LOG_DIR=self.TEST_OUTPUT_DIRECTORY, auto_play_log_filename=file_name,
                                  GAMES_TO_AUTOPLAY=1, REMOVE_DRAWN_CARDS_FROM_DECK=False, SILENT_MODE=True,
                                  LOG_ALL=True)
         self.assertEqual(results["player_scores"], [85])

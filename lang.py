@@ -1,0 +1,41 @@
+GER = {
+    "start_dealer_no_redraw": "Starte ein neues Spiel als Dealer.\n(Normale Version)",
+    "start_dealer_redraw": "Starte ein neues Spiel als Dealer.\n(Karten können mehrmarls gezogen werden)",
+    "start_player_no_redraw": "Starte ein neues Spiel als Spieler.\n(Normale Version)",
+    "start_player_redraw": "Starte ein neues Spiel als Spieler.\n(Karten können mehrmarls gezogen werden)",
+    "player_action": "Versuche, deine Karte mit dem Dealer zu tauschen",
+    "player_action_success": "Der Spieler hat seine Karte mit dem Dealer getauscht",
+    "player_action_failure": "Der Spieler konnte die Karten nicht tauschen",
+    "player_no_action": "Der Spieler hat nicht versucht. die Karten zu tauschen",
+    "dealer_action": "Versuche, deine Karte auszutauschen",
+    "dealer_action_success": "Der Dealer hat seine Karte ausgetauscht",
+    "dealer_action_failure": "Der Dealer konnte seine Karte nicht austauschen",
+    "dealer_no_action": "Der Dealer hat nicht versucht. seine Karte auszutauschen.",
+    "no_action": "Karte behalten",
+    "dealer_win": "Der Dealer hat gewonnen.\n",
+    "draw": "Unentschieden.\n",
+    "player_win": "Der Spieler hat gewonnen.\n",
+    "player_score": "Spieler Punktzahl: ",
+    "dealer_score": "Dealer Punktzahl: "
+}
+
+EN = {
+    "start_dealer_no_redraw": "Start a new game as dealer.\n(Regular version)",
+    "start_dealer_redraw": "Start a new game as dealer.\n(Cards can be drawn multiple times)",
+    "start_player_no_redraw": "Start a new game as player.\n(Regular version)",
+    "start_player_redraw": "Start a new game as player.\n(Cards can be drawn multiple times)",
+    "player_action": "Attempt to trade cards",
+    "player_action_success": "The player traded cards with the dealer",
+    "player_action_failure": "The player failed to trade cards with the dealer",
+    "player_no_action": "The player did not attempt to trade cards",
+    "dealer_action": "Attempt to redraw your card",
+    "dealer_action_success": "The dealer redrew his card",
+    "dealer_action_failure": "The dealer failed to redraw his card",
+    "dealer_no_action": "The dealer did not attempt to redraw his card",
+    "no_action": "Keep your card",
+    "dealer_win": "The dealer won.\n",
+    "draw": "The game end in a draw.\n",
+    "player_win": "The player won.\n",
+    "player_score": "Player score: ",
+    "dealer_score": "Dealer score: "
+}

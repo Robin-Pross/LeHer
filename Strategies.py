@@ -1,4 +1,4 @@
-from Scorer import STANDARD_SCORER
+from Scorer import standard_scorer
 
 
 class Strategy:
@@ -7,7 +7,7 @@ class Strategy:
     This class is supposed to be used as superclass for other strategies.
     """
 
-    def __init__(self, is_player: bool, scorer=STANDARD_SCORER):
+    def __init__(self, is_player: bool, scorer=standard_scorer):
         """
         Makes the parameters class variables with the same name and value.
 
@@ -23,7 +23,7 @@ class Strategy:
 
 
 class KeepNAndAbove(Strategy):
-    def __init__(self, n: int, is_player: bool, scorer=STANDARD_SCORER):
+    def __init__(self, n: int, is_player: bool, scorer=standard_scorer):
         """
         Makes the parameters class variables with the same name and value.
 

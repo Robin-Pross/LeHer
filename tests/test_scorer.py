@@ -1,7 +1,7 @@
 import unittest
 
 from Decks import STANDARD_DECK
-from Scorer import STANDARD_SCORER
+from Scorer import standard_scorer
 
 
 class TestScorer(unittest.TestCase):
@@ -13,4 +13,4 @@ class TestScorer(unittest.TestCase):
             2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 1
         ]
         for card, value in zip(STANDARD_DECK, expected_values_of_standard_deck_of_52):
-            self.assertEqual(STANDARD_SCORER(card), value)
+            self.assertEqual(standard_scorer(card), value)

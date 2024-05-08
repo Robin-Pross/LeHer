@@ -1,6 +1,5 @@
-import Strategies
+from GUI import GUI
 from LeHer import LeHer
-from datetime import datetime
 import numpy as np
 
 
@@ -70,17 +69,24 @@ def tournament(player_strategies, dealer_strategies, REMOVE_DRAWN_CARDS_FROM_DEC
 
 
 if __name__ == "__main__":
+    game_window = GUI()
+    exit(0)
+
     game = LeHer()
 
     player_strategies_to_test = [
-        (Strategies.KeepNAndAbove(n=8, is_player=True), "keep 8 and above")
+        (Strategies.KeepNAndAbove(n=7, is_player=True), "keep 7 and above"),
+        (Strategies.KeepNAndAbove(n=8, is_player=True), "keep 8 and above"),
+        (Strategies.KeepNAndAbove(n=9, is_player=True), "keep 9 and above")
     ]
 
     dealer_strategies_to_test = [
-        (Strategies.KeepNAndAbove(n=8, is_player=False), "keep 8 and above")
+        (Strategies.KeepNAndAbove(n=7, is_player=False), "keep 7 and above"),
+        (Strategies.KeepNAndAbove(n=8, is_player=False), "keep 8 and above"),
+        (Strategies.KeepNAndAbove(n=9, is_player=False), "keep 9 and above")
     ]
 
     tournament(player_strategies_to_test, dealer_strategies_to_test, REMOVE_DRAWN_CARDS_FROM_DECK=True,
-               OUTPUT_FOLDER="output/remove/")
+               OUTPUT_FOLDER="output/remove/", GAMES_TO_AUTOPLAY=10 ** 7)
     tournament(player_strategies_to_test, dealer_strategies_to_test, REMOVE_DRAWN_CARDS_FROM_DECK=False,
-               OUTPUT_FOLDER="output/dupe/")
+               OUTPUT_FOLDER="output/dupe/", GAMES_TO_AUTOPLAY=10 ** 7)

@@ -1,4 +1,4 @@
-def STANDARD_SCORER(card):
+def standard_scorer(card):
     """
     Returns an int with the rank of the card.
     Aces have a score of 1.
