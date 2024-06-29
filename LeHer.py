@@ -68,7 +68,9 @@ class LeHer:
                  see get_results in DataProcessing for more info
         """
         # add .json at the end if not already present
-        if auto_play_log_filename[:-5] != ".json":
+        if len(auto_play_log_filename) <= 5:
+            auto_play_log_filename = auto_play_log_filename + ".json"
+        elif auto_play_log_filename[-5:] != ".json":
             auto_play_log_filename = auto_play_log_filename + ".json"
         current_game = 0
         logger = DataProcessing.StaggeredLogger(AUTO_PLAY_LOG_DIR, auto_play_log_filename)

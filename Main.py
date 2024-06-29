@@ -1,3 +1,4 @@
+import Strategies
 from GUI import GUI
 from LeHer import LeHer
 import numpy as np
