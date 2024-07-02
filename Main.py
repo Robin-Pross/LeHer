@@ -70,7 +70,7 @@ def tournament(player_strategies, dealer_strategies, REMOVE_DRAWN_CARDS_FROM_DEC
 
 
 if __name__ == "__main__":
-    game_window = GUI()
+    game_window = GUI(gui_language="GER")
     exit(0)
 
     game = LeHer()
