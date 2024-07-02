@@ -1,10 +1,11 @@
 import Strategies
 from GUI import GUI
 from LeHer import LeHer
+from pathlib import Path
 import numpy as np
 
 
-def tournament(player_strategies, dealer_strategies, REMOVE_DRAWN_CARDS_FROM_DECK=False,
+def tournament(player_strategies, dealer_strategies, path_to_main, REMOVE_DRAWN_CARDS_FROM_DECK=False,
                GAMES_TO_AUTOPLAY=1000000, OUTPUT_FOLDER="output/"):
     """
     Simulates specified (1.000.000 by default) amount of games for every possible player-dealer strategy combination.
@@ -19,6 +20,7 @@ def tournament(player_strategies, dealer_strategies, REMOVE_DRAWN_CARDS_FROM_DEC
 
     :param player_strategies: list of tuples (strategy, name)
     :param dealer_strategies: list of tuples (strategy, name)
+    :param path_to_main: the path to the main file
     :param REMOVE_DRAWN_CARDS_FROM_DECK: whether drawn card should be removed from the deck
     :param GAMES_TO_AUTOPLAY: the amount of games to play for every possible player-dealer strategy combination
     :param OUTPUT_FOLDER: the folder where game data and results should be saved as
@@ -33,7 +35,7 @@ def tournament(player_strategies, dealer_strategies, REMOVE_DRAWN_CARDS_FROM_DEC
         for j, ds in enumerate(dealer_strategies):
             current_log_file = ps[1] + " (player) vs " + ds[1] + " (dealer).json"
             current_game = LeHer(PLAYER_AI=ps[0], DEALER_AI=ds[0])
-            current_game_results = current_game.auto_play(GAMES_TO_AUTOPLAY, OUTPUT_FOLDER, current_log_file,
+            current_game_results = current_game.auto_play(GAMES_TO_AUTOPLAY, path_to_main + OUTPUT_FOLDER, current_log_file,
                                                           REMOVE_DRAWN_CARDS_FROM_DECK)
             player_scores = current_game_results["player_scores"]
             dealer_scores = current_game_results["dealer_scores"]
@@ -65,12 +67,15 @@ def tournament(player_strategies, dealer_strategies, REMOVE_DRAWN_CARDS_FROM_DEC
         results.append(rate)
     np_results = np.array(results)
     np.set_printoptions(suppress=True)
-    np.savetxt(OUTPUT_FOLDER + "results.txt", np_results, fmt="%f")
+    np.savetxt(path_to_main + OUTPUT_FOLDER + "results.txt", np_results, fmt="%f")
     print(np_results)
 
 
 if __name__ == "__main__":
-    game_window = GUI(gui_language="GER")
+    # If Main.py is not called from the LeHer directory than the res and output folder use the wrong paths
+    # to fix this the absolute path of Main.py must be used
+    path_to_main = str(Path(__file__).parent) + "/"
+    game_window = GUI(path_to_main, gui_language="GER")
     exit(0)
 
     game = LeHer()
@@ -87,7 +92,7 @@ if __name__ == "__main__":
         (Strategies.KeepNAndAbove(n=9, is_player=False), "keep 9 and above")
     ]
 
-    tournament(player_strategies_to_test, dealer_strategies_to_test, REMOVE_DRAWN_CARDS_FROM_DECK=True,
+    tournament(player_strategies_to_test, dealer_strategies_to_test, path_to_main, REMOVE_DRAWN_CARDS_FROM_DECK=True,
                OUTPUT_FOLDER="output/remove/", GAMES_TO_AUTOPLAY=10 ** 7)
-    tournament(player_strategies_to_test, dealer_strategies_to_test, REMOVE_DRAWN_CARDS_FROM_DECK=False,
+    tournament(player_strategies_to_test, dealer_strategies_to_test, path_to_main, REMOVE_DRAWN_CARDS_FROM_DECK=False,
                OUTPUT_FOLDER="output/dupe/", GAMES_TO_AUTOPLAY=10 ** 7)

@@ -1,5 +1,10 @@
 # le-her
 
-Requires the python modules:
+Required Programs :
+- Python 3 (https://www.python.org/)
+
+Required Python Modules :
 - numpy (https://numpy.org/)
-- pyqt 
+    >> pip install numpy
+- pyqt5 (https://pypi.org/project/PyQt5/)
+    >> pip install PyQt5

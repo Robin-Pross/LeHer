@@ -14,7 +14,7 @@ class GUI:
     The graphical user interface for an instance of the game le her.
     """
 
-    def __init__(self, *,
+    def __init__(self, path_to_main, *,
                  unshuffled_deck=STANDARD_DECK, SCORER=standard_scorer, PLAYER_AI=KeepNAndAbove(n=8, is_player=True),
                  DEALER_AI=KeepNAndAbove(n=8, is_player=False),
                  gui_language="EN",
@@ -23,6 +23,7 @@ class GUI:
         """
         Opens a new window with the game Le Her.
 
+        :param path_to_main: the path to the main file
         :param unshuffled_deck: the deck to be used, standard deck of 52 by default
         :param SCORER: the scorer
         :param PLAYER_AI: the player AI
@@ -35,7 +36,8 @@ class GUI:
         app = QApplication(sys.argv)
         main_window = QtWidgets.QMainWindow()
         main_window.setWindowTitle("Le Her")
-        GUIWindow(main_window=main_window, unshuffled_deck=unshuffled_deck, SCORER=SCORER, PLAYER_AI=PLAYER_AI,
+        GUIWindow(path_to_main=path_to_main, main_window=main_window, unshuffled_deck=unshuffled_deck, SCORER=SCORER,
+                  PLAYER_AI=PLAYER_AI,
                   DEALER_AI=DEALER_AI,
                   gui_language=gui_language,
                   RNG_SEED=RNG_SEED, PRE_SHUFFLED_DECK=PRE_SHUFFLED_DECK,
@@ -45,7 +47,7 @@ class GUI:
 
 
 class GUIWindow(QMainWindow):
-    def __init__(self, main_window,
+    def __init__(self, path_to_main, main_window,
                  unshuffled_deck=STANDARD_DECK, SCORER=standard_scorer, PLAYER_AI=KeepNAndAbove(8, True),
                  DEALER_AI=KeepNAndAbove(8, False),
                  gui_language="EN",
@@ -53,7 +55,7 @@ class GUIWindow(QMainWindow):
                  HIDE_UNKNOWN_CARDS=True):
         """
 
-
+        :param path_to_main: the path to the main file
         :param unshuffled_deck: the deck to be used, standard deck of 52 by default
         :param SCORER: the scorer
         :param PLAYER_AI: the player AI
@@ -118,15 +120,15 @@ class GUIWindow(QMainWindow):
 
         # Create Content
         self.cardArtDictionary = {
-            "unknown": (QtGui.QPixmap("res/unknown.png")
+            "unknown": (QtGui.QPixmap(path_to_main + "res/unknown.png")
                         .scaled(QtCore.QSize(80, 140),
                                 aspectRatioMode=QtCore.Qt.AspectRatioMode.KeepAspectRatio)),
-            "empty": (QtGui.QPixmap("res/empty.png")
+            "empty": (QtGui.QPixmap(path_to_main + "res/empty.png")
                       .scaled(QtCore.QSize(80, 140),
                               aspectRatioMode=QtCore.Qt.AspectRatioMode.KeepAspectRatio))
         }
         for card in self.CARDS:
-            self.cardArtDictionary[card] = (QtGui.QPixmap("res/" + card + ".png")
+            self.cardArtDictionary[card] = (QtGui.QPixmap(path_to_main + "res/" + card + ".png")
                                             .scaled(QtCore.QSize(80, 140),
                                                     aspectRatioMode=QtCore.Qt.AspectRatioMode.KeepAspectRatio))
 
@@ -192,7 +194,7 @@ class GUIWindow(QMainWindow):
             self.DealerAction.clicked.disconnect()
         except TypeError:
             # "TypeError: disconnect() failed between 'clicked' and all its connections"
-            # Error above happens if nothing is connected
+            # Error above happens if nothing is connected, can be ignored
             pass
         self.PlayerNoAction.clicked.connect(lambda: self.initialize_game(True, True))
         self.DealerNoAction.setText(self.dict["start_dealer_no_redraw"])
