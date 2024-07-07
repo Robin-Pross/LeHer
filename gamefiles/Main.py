@@ -1,3 +1,5 @@
+import argparse
+
 import Strategies
 from GUI import GUI
 from LeHer import LeHer
@@ -35,7 +37,8 @@ def tournament(player_strategies, dealer_strategies, path_to_main, REMOVE_DRAWN_
         for j, ds in enumerate(dealer_strategies):
             current_log_file = ps[1] + " (player) vs " + ds[1] + " (dealer).json"
             current_game = LeHer(PLAYER_AI=ps[0], DEALER_AI=ds[0])
-            current_game_results = current_game.auto_play(GAMES_TO_AUTOPLAY, path_to_main + OUTPUT_FOLDER, current_log_file,
+            current_game_results = current_game.auto_play(GAMES_TO_AUTOPLAY, path_to_main + OUTPUT_FOLDER,
+                                                          current_log_file,
                                                           REMOVE_DRAWN_CARDS_FROM_DECK)
             player_scores = current_game_results["player_scores"]
             dealer_scores = current_game_results["dealer_scores"]
@@ -72,10 +75,14 @@ def tournament(player_strategies, dealer_strategies, path_to_main, REMOVE_DRAWN_
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser("main")
+    parser.add_argument("language", nargs="?", help="The language of the GUI, valid options are EN and GER",
+                        default="GER")
+    args = parser.parse_args()
     # If Main.py is not called from the LeHer directory than the res and output folder use the wrong paths
     # to fix this the absolute path of Main.py must be used
     path_to_main = str(Path(__file__).parent) + "/"
-    game_window = GUI(path_to_main, gui_language="GER")
+    game_window = GUI(path_to_main, gui_language=args.language)
     exit(0)
 
     game = LeHer()

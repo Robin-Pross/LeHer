@@ -1,8 +1,8 @@
 import os
 import unittest
 
-from LeHer import LeHer
-from Decks import STANDARD_DECK
+from code.LeHer import LeHer
+from code.Decks import STANDARD_DECK
 
 
 class TestAutoPlay(unittest.TestCase):

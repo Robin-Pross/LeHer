@@ -1,7 +1,7 @@
 import unittest
 
-from Decks import STANDARD_DECK
-from Scorer import standard_scorer
+from code.Decks import STANDARD_DECK
+from code.Scorer import standard_scorer
 
 
 class TestScorer(unittest.TestCase):

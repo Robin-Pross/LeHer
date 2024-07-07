@@ -1,8 +1,8 @@
 import unittest
 
-from Decks import STANDARD_DECK
-from Strategies import KeepNAndAbove
-from Scorer import standard_scorer
+from code.Decks import STANDARD_DECK
+from code.Strategies import KeepNAndAbove
+from code.Scorer import standard_scorer
 
 
 class TestKeepNAndAbove(unittest.TestCase):

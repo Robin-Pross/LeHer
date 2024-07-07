@@ -334,9 +334,9 @@ class GUIWindow(QMainWindow):
         self.disable_all()
         if self.game.dealer_action():
             self.ActionLog.setText(self.dict["dealer_action_success"])
-            self.update_card(False, self.current_turn)
         else:
             self.ActionLog.setText(self.dict["dealer_action_failure"])
+        self.update_card(False, self.current_turn)
         self.ask_player()
 
     def player_action(self):
@@ -347,10 +347,10 @@ class GUIWindow(QMainWindow):
         self.disable_all()
         if self.game.player_action():
             self.ActionLog.setText(self.dict["player_action_success"])
-            self.update_card(True, self.current_turn)
-            self.update_card(False, self.current_turn)
         else:
             self.ActionLog.setText(self.dict["player_action_failure"])
+        self.update_card(True, self.current_turn)
+        self.update_card(False, self.current_turn)
         self.ask_dealer()
 
     def dealer_no_action(self):

@@ -179,12 +179,12 @@ class LeHer:
         Fails if the dealers current card is a king.
         Changes player history and revealed status.
         """
+        self.revealed_dealer_cards_to_player[self.turn_count] = True
+        self.revealed_player_cards_to_dealer[self.turn_count] = True
         if self.dealer_cards[-1][0] == "K":
             self.player_history.append("ATTEMPTED_BUT_FAILED")
             return False
         self.player_history.append("SUCCEEDED")
-        self.revealed_dealer_cards_to_player[self.turn_count] = True
-        self.revealed_player_cards_to_dealer[self.turn_count] = True
         temp = self.player_cards[-1]
         self.player_cards[-1] = self.dealer_cards[-1]
         self.dealer_cards[-1] = temp
@@ -196,6 +196,8 @@ class LeHer:
         Fails if the next card in the deck is a king.
         Changes dealer history and revealed status.
         """
+        if self.turn_count + 1 < self.TURNS_PER_GAME:
+            self.revealed_player_cards_to_dealer[self.turn_count + 1] = True
         if not self.remove_drawn_cards_from_deck and self.PRE_SHUFFLED_DECK is None:
             new_card = random.choice(self.current_deck)
             self.shuffled_deck.append(new_card)
@@ -206,8 +208,6 @@ class LeHer:
             self.next_player_card = self.dealer_cards[-1]
             self.dealer_cards[-1] = new_card
             self.revealed_dealer_cards_to_player[self.turn_count] = False
-            if self.turn_count + 1 < self.TURNS_PER_GAME:
-                self.revealed_player_cards_to_dealer[self.turn_count + 1] = True
             self.dealer_history.append("SUCCEEDED")
             return True
         if self.current_deck[-1][0] == "K":
@@ -218,8 +218,6 @@ class LeHer:
         self.current_deck.append(self.dealer_cards[-1])
         self.dealer_cards[-1] = temp
         self.revealed_dealer_cards_to_player[self.turn_count] = False
-        if self.turn_count + 1 < self.TURNS_PER_GAME:
-            self.revealed_player_cards_to_dealer[self.turn_count + 1] = True
         return True
 
     def score(self):
